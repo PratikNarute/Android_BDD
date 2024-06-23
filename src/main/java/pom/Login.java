@@ -3,6 +3,7 @@ package pom;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.testng.Assert;
 import org.testng.asserts.SoftAssert;
 
 import io.appium.java_client.android.AndroidDriver;
@@ -71,6 +72,7 @@ public class Login extends AppiumDriverSetup {
 			click_action(termCondition_toggle);
 			click_action(continue_button);
 			click_action(info_image);
+
 		}
 
 		public void validate_logout_scenarios(String country) throws InterruptedException {

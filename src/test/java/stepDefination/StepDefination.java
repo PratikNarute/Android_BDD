@@ -4,6 +4,7 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.testng.Assert;
 
 import static stepDefination.BaseClass.*;
 
@@ -73,6 +74,7 @@ public class StepDefination {
     @Given("user should be login successfully {string}")
     public void userShouldBeLoginSuccessfully(String country) throws InterruptedException {
         lg.validate_login_pages_with_valid_credentials(country);
+
     }
 
     @And("click on redeem no button")

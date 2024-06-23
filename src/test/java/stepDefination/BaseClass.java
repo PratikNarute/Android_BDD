@@ -6,6 +6,7 @@ import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 import io.appium.java_client.android.AndroidDriver;
 import io.cucumber.java.*;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.poi.ss.formula.functions.T;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -16,6 +17,8 @@ import pom.Dashboard;
 import pom.Login;
 import pom.Top_Up;
 import utility.AppiumDriverSetup;
+
+import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 
@@ -61,8 +64,11 @@ public class BaseClass {
         // Take screenshot and attach to Extent report
         if(scenario.isFailed())
         {
-            scenario.log("Test step is failed");
-            scenario.attach(((TakesScreenshot)driver).getScreenshotAs(OutputType.BYTES), "image/png", scenario.getName());
+            if(scenario.isFailed()) {
+                File screenshot = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+                byte[] fileContent = FileUtils.readFileToByteArray(screenshot);
+                scenario.attach(fileContent, "image/png", "screenshot");
+            }
         }
     }
     @After
