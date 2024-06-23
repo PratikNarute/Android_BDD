@@ -6,7 +6,7 @@ import io.cucumber.testng.CucumberOptions;
 
 @CucumberOptions(
         features = {".//src//test//java//feature"},
-        tags="@AT",
+        tags="@AT and @QuickTop",
         glue = "stepDefination",
         dryRun = false,
         monochrome = true,

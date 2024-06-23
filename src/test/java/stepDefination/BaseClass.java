@@ -43,9 +43,6 @@ public class BaseClass {
        String countryName = arrayContryName[0];
        String appPackageName = getAppPackageName(countryName);
 
-        report = new ExtentReports(); // To generate extent report
-        spark = new ExtentSparkReporter("Extent Report/report.html");  //Set path in system for attach the generated report
-        report.attachReporter(spark);
         AppiumDriverSetup.startAppiumServer();
         AppiumDriverSetup.lunchAndroidDriver(appPackageName);
         driver = AppiumDriverSetup.driver;
