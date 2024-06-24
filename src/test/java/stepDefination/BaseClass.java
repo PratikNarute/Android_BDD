@@ -16,11 +16,17 @@ import org.testng.asserts.SoftAssert;
 import pom.Dashboard;
 import pom.Login;
 import pom.Top_Up;
+import testRunner.Sanity_Run;
 import utility.AppiumDriverSetup;
 
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
+
+import io.cucumber.java.*;
+
 
 
 public class BaseClass {
@@ -32,6 +38,8 @@ public class BaseClass {
     public static Dashboard ds;
     public SoftAssert sa;
     public static AndroidDriver driver;
+    public static String platformExecution;
+
 
 
     public void POM_Class_objects() throws IOException {
@@ -49,6 +57,13 @@ public class BaseClass {
         AppiumDriverSetup.startAppiumServer();
         AppiumDriverSetup.lunchAndroidDriver(appPackageName);
         driver = AppiumDriverSetup.driver;
+        platformExecution = AppiumDriverSetup.platformExecution;
+
+        if(platformExecution.equalsIgnoreCase("Lambda Cloud")){
+            // Set name of scenario in Lambda configuration
+            driver.executeScript("lambda-name=" + scenario.getName());
+        }
+
 
         POM_Class_objects();
     }
@@ -74,10 +89,18 @@ public class BaseClass {
     @After
     public void closeBrowser(Scenario scenario) throws InterruptedException {
         Thread.sleep(2000);
+
+        if(platformExecution.equalsIgnoreCase("Lambda Cloud")){
+            // Set the status like pass or failed in lambda configuration
+            driver.executeScript("lambda-status=" + (scenario.isFailed() ? "failed" : "passed"));
+            System.out.println(driver.getSessionId());
+        }
+
         driver.quit();
         System.out.println("Driver closed: ");
-       String appiumLocalServer = AppiumDriverSetup.stopAppiumLocalServer();
-        System.out.println("Appium Local Server: ");
+        AppiumDriverSetup.stopAppiumLocalServer();
+        System.out.println("Appium Local Server: "+AppiumDriverSetup.stopAppiumLocalServer());
+
     }
 
     public String getAppPackageName(String country){

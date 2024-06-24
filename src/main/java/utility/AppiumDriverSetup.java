@@ -5,6 +5,8 @@ import io.appium.java_client.android.options.UiAutomator2Options;
 import io.appium.java_client.service.local.AppiumDriverLocalService;
 import io.appium.java_client.service.local.AppiumServiceBuilder;
 import io.appium.java_client.service.local.flags.GeneralServerFlag;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.Assert;
 
 import java.io.BufferedReader;
@@ -20,6 +22,8 @@ public class AppiumDriverSetup {
 
     private static AppiumDriverLocalService service;
     public static AndroidDriver driver;
+    public static UiAutomator2Options options;
+    public static String platformExecution= "Lambda Cloud";
 
     public static void startAppiumServer() {
         try {
@@ -70,28 +74,53 @@ public class AppiumDriverSetup {
 
     public static String stopAppiumLocalServer() {
         if (service != null && service.isRunning()) {
-            service.stop();
-            return "Appium Local server stopped: ";
+             service.stop();
+            return "Running Appium Local server stopped: ";
         }else{
             return "Currently Appium Local server not running: ";
         }
     }
 
     public static void lunchAndroidDriver(String appPackageName) throws MalformedURLException {
-        UiAutomator2Options options = new UiAutomator2Options();
-        options.setDeviceName(getDeviceName());
+        if(platformExecution.equalsIgnoreCase("Local")){
+            // Set capabilities using UiAutomator2Options for local test execution
+            options = new UiAutomator2Options();
+            options.setDeviceName(getDeviceName());
 //    	options.setApp(appPath);
-        options.setAutomationName("UiAutomator2");
-        options.setAppPackage(appPackageName);
-        options.setAppActivity("com.lycamobile.MainActivity");
-        options.setCapability("autoDismissAlerts", true);
+            options.setAutomationName("UiAutomator2");
+            options.setAppPackage(appPackageName);
+            options.setAppActivity("com.lycamobile.MainActivity");
+            options.setCapability("autoDismissAlerts", true);
 //		options.setNoReset(true);
 //		options.setFullReset(true);
-        options.autoGrantPermissions();
-        options.setUiautomator2ServerInstallTimeout(Duration.ofMillis(60000));
-        options.setAndroidInstallTimeout(Duration.ofMillis(10000));
-        options.setAdbExecTimeout(Duration.ofSeconds(20));
-        driver = new AndroidDriver(new URL("http://127.0.0.1:4723"),options);
+            options.autoGrantPermissions();
+            options.setUiautomator2ServerInstallTimeout(Duration.ofMillis(60000));
+            options.setAndroidInstallTimeout(Duration.ofMillis(10000));
+            options.setAdbExecTimeout(Duration.ofSeconds(20));
+            driver = new AndroidDriver(new URL("http://127.0.0.1:4723"),options);
+        }
+        else{
+            // Set capabilities using UiAutomator2Options for lambda cloud test execution
+            options = new UiAutomator2Options();
+            options.setPlatformName("ANDROID");
+            options.setDeviceName("Galaxy .*");
+            options.setPlatformVersion("13");
+            options.setCapability("build", "LT-appium-java-cucumber");
+            options.setCapability("name", "Android Test");
+            options.setCapability("isRealMobile", true);
+            options.setCapability("app", "lt://APP1016034991715000332382475");
+            options.setCapability("devicelog", true);
+            options.setCapability("autoGrantPermissions", true);
+            options.setCapability("network", false);
+            options.setCapability("video", true);
+            options.setCapability("visual", true);
+
+            String gridURL = "https://" + "krushna.jenaqualitrix" + ":" + "ZyDVxJ8RZPug8JkmTnWaMLcLf1LPTMxkWzwX6nIWWPbgfrQyjT" + "@" + "mobile-hub.lambdatest.com" + "/wd/hub";
+//      String gridURL = "https://krushna.jenaqualitrix:ZyDVxJ8RZPug8JkmTnWaMLcLf1LPTMxkWzwX6nIWWPbgfrQyjT@mobile-hub.lambdatest.com/wd/hub";
+
+            // Initialize the AndroidDriver
+            driver = new AndroidDriver(new URL(gridURL), options);
+        }
     }
 
     public static String getDeviceName(){

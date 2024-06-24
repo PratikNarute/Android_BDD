@@ -39,8 +39,6 @@ public class Login extends AppiumDriverSetup {
 		@FindBy (xpath = "//android.widget.Button[@resource-id=\"com.android.permissioncontroller:id/permission_allow_button\"]")private WebElement allow_button;
 		@FindBy (xpath = "//android.widget.TextView[@text=\"English\"]") WebElement english_button;
 
-		
-		
 
 
 		public Login()
