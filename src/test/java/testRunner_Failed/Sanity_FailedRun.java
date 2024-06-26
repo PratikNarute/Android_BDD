@@ -1,23 +1,23 @@
-package testRunner;
-
+package testRunner_Failed;
 
 import io.cucumber.testng.AbstractTestNGCucumberTests;
 import io.cucumber.testng.CucumberOptions;
 
+
+
 @CucumberOptions(
-        features = {".//src//test//java//feature"},
-        tags="@AT",
+        features ={"@target/Failed/Sanity.txt"},
+        tags="@Sanity",
         glue = "stepDefination",
         dryRun = false,
         monochrome = true,
         plugin = {"pretty",
 //                "html:test-output/cucumber-reports/html-report.html",
 //                "json:test-output/cucumber-reports/json-report.json",
-                "com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter:",
-                "json:target/cucumber.json", "rerun:target/Failed/AT.txt"
+                "com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter:"
         }
 )
+public class Sanity_FailedRun extends AbstractTestNGCucumberTests {
 
-public class AT_Run extends AbstractTestNGCucumberTests {
 
 }

@@ -1,12 +1,12 @@
-package testRunner;
+package testRunner_Failed;
 
 
 import io.cucumber.testng.AbstractTestNGCucumberTests;
 import io.cucumber.testng.CucumberOptions;
 
 @CucumberOptions(
-        features = {".//src//test//java//feature"},
-        tags="@AT",
+        features = {"@target/Failed/AT.txt"},
+        tags="@AT and @QuickTop",
         glue = "stepDefination",
         dryRun = false,
         monochrome = true,
@@ -14,10 +14,9 @@ import io.cucumber.testng.CucumberOptions;
 //                "html:test-output/cucumber-reports/html-report.html",
 //                "json:test-output/cucumber-reports/json-report.json",
                 "com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter:",
-                "json:target/cucumber.json", "rerun:target/Failed/AT.txt"
         }
 )
 
-public class AT_Run extends AbstractTestNGCucumberTests {
+public class AT_FailedRun extends AbstractTestNGCucumberTests {
 
 }

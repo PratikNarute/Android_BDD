@@ -26,7 +26,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import io.cucumber.java.*;
-
+import utility.ReadProperty;
 
 
 public class BaseClass {
@@ -38,9 +38,6 @@ public class BaseClass {
     public static Dashboard ds;
     public SoftAssert sa;
     public static AndroidDriver driver;
-    public static String platformExecution;
-
-
 
     public void POM_Class_objects() throws IOException {
         lg = new Login();
@@ -53,18 +50,18 @@ public class BaseClass {
        String [] arrayContryName= scenario.getName().split("-");
        String countryName = arrayContryName[0];
        String appPackageName = getAppPackageName(countryName);
+        System.out.println("Start execution on platform: "+ ReadProperty.getPropertiesData("Platform_Execution"));
+        System.out.println("Start execution for App Package: "+appPackageName);
 
         AppiumDriverSetup.startAppiumServer();
-        AppiumDriverSetup.lunchAndroidDriver(appPackageName);
+        AppiumDriverSetup.lunchAndroidDriver(appPackageName, countryName);
         driver = AppiumDriverSetup.driver;
-        platformExecution = AppiumDriverSetup.platformExecution;
 
-        if(platformExecution.equalsIgnoreCase("Lambda Cloud")){
+        // Set name scnario name for lambda execution
+        if(ReadProperty.getPropertiesData("Platform_Execution").equalsIgnoreCase("Lambda_Cloud")){
             // Set name of scenario in Lambda configuration
             driver.executeScript("lambda-name=" + scenario.getName());
         }
-
-
         POM_Class_objects();
     }
 
@@ -87,10 +84,10 @@ public class BaseClass {
         }
     }
     @After
-    public void closeBrowser(Scenario scenario) throws InterruptedException {
+    public void closeBrowser(Scenario scenario) throws InterruptedException, IOException {
         Thread.sleep(2000);
 
-        if(platformExecution.equalsIgnoreCase("Lambda Cloud")){
+        if(ReadProperty.getPropertiesData("Platform_Execution").equalsIgnoreCase("Lambda_Cloud")){
             // Set the status like pass or failed in lambda configuration
             driver.executeScript("lambda-status=" + (scenario.isFailed() ? "failed" : "passed"));
             System.out.println(driver.getSessionId());

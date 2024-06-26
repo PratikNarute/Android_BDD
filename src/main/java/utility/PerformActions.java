@@ -1,28 +1,23 @@
 package utility;
 
+import java.io.IOException;
 import java.time.Duration;
 
 
-import com.fasterxml.jackson.databind.JsonSerializable;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
-import com.google.common.collect.ImmutableMap;
 
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.nativekey.AndroidKey;
 import io.appium.java_client.android.nativekey.KeyEvent;
-import io.appium.java_client.touch.LongPressOptions;
 import io.appium.java_client.touch.WaitOptions;
-import io.appium.java_client.touch.offset.ElementOption;
 import io.appium.java_client.touch.offset.PointOption;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.PointerInput;
 import org.openqa.selenium.interactions.Sequence;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
 
 import java.util.Arrays;
@@ -40,6 +35,7 @@ public class PerformActions extends AppiumDriverSetup
 		    WaitOptions waitOption = WaitOptions.waitOptions(Duration.ofMillis(1000));
 
 		    touchAction.press(pointStart).waitAction(waitOption).moveTo(pointEnd).release().perform();
+
 	}
 	public static void longPress(int x, int y, AndroidDriver driver)
 	{
@@ -50,16 +46,15 @@ public class PerformActions extends AppiumDriverSetup
 		   touchAction.longPress(point).waitAction(waitOption).release().perform();
 
 	}
-	public static void scrollAction(int startX, int startY, int endX, int endY, AndroidDriver driver) throws InterruptedException
+	public static void scrollAction(int startX, int startY, int endX, int endY, String ErroMessage) throws InterruptedException
 	{
-		Thread.sleep(1000);
-		TouchAction touchAction = new TouchAction(driver);
-	    PointOption pointStart = PointOption.point(startX, startY);
-	    PointOption pointEnd = PointOption.point(endX, endY);
-	    WaitOptions waitOption = WaitOptions.waitOptions(Duration.ofMillis(2000));
+		try{
+			TouchAction touchAction = new TouchAction(driver);
+			touchAction.longPress(PointOption.point(startX, startY)).moveTo(PointOption.point(endX, endY)).release().perform();
+		}catch (Exception e){
+			Assert.fail(ErroMessage+" "+e.getMessage());
+ 		}
 
-	    touchAction.press(pointStart).waitAction(waitOption).moveTo(pointEnd).release().perform();
-	    Thread.sleep(1000);
 	}
 
 
@@ -95,7 +90,7 @@ public class PerformActions extends AppiumDriverSetup
 				//perform the Sequence of action
 				driver.perform(Collections.singletonList(longpress));
 	}
-	public static void click_action(WebElement el) throws InterruptedException {
+	public static void click_action(WebElement el, String ErrorMessage) throws InterruptedException {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
 		try {
 			wait.until(ExpectedConditions.elementToBeClickable(el));
@@ -110,7 +105,7 @@ public class PerformActions extends AppiumDriverSetup
 			System.out.println("=====================================Done============================================");
 		} catch (TimeoutException e) {
 			System.out.println("==============================Fail===============================================");
-			Assert.fail("Found NoSuchElementException for: " + e.getMessage());
+			Assert.fail(ErrorMessage+": Found NoSuchElementException for: " + e.getMessage());
 		}catch (ElementClickInterceptedException e){
 			System.out.println("Found ElementClickInterceptedException: " + el);
 			Thread.sleep(4000);
@@ -120,13 +115,13 @@ public class PerformActions extends AppiumDriverSetup
 		}
 	}
 
-	public static void  send_action(WebElement el, String data) throws InterruptedException {
+	public static void  send_action(WebElement el, String data, String ErrorMessage) throws InterruptedException {
 //        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
 		try {
 			wait.until(ExpectedConditions.visibilityOf(el));
 //			System.out.println("Send action perform on: " + el.getAttribute("value"));
-			System.out.println("Send action perform on: " + el.getAttribute("text"));
+			System.out.println(ErrorMessage+": Send action perform on: " + el.getAttribute("text"));
 			el.sendKeys(data);
 			System.out.println("=====================================Done============================================");
 		} catch (TimeoutException e) {
@@ -146,47 +141,39 @@ public class PerformActions extends AppiumDriverSetup
 
 	}
 
-	public static void scrollToElement_Downward(WebElement targetElement) {
+	public static void scrollToElement_Downward(WebElement targetElement, String ErrorMessage) throws IOException, InterruptedException {
 		int start_x =631;
 		int start_Y =1500;
 		int end_x =631;
 		int end_Y =500;
 
-		if(AppiumDriverSetup.getDeviceName().equalsIgnoreCase("Cloud Device")){
-			try {
+		if(ReadProperty.getPropertiesData("Platform_Execution").equalsIgnoreCase("Lambda_Cloud")){
 				for (int i = 0; i < 10; i++) {
-					swipeAction(start_x, start_Y, end_x, end_Y);
+					scrollAction(start_x, start_Y, end_x, end_Y, ErrorMessage);
 					if (isElementDisplayed(targetElement)) {
 						break;
 					}
 				}
-			} catch (Exception e) {
-				System.out.println("Scroll to mobile element failed"+e.getMessage());
-			}
 		}else{
-			try {
 				for (int i = 0; i < 10; i++) {
-					swipeDownwardBy_Coordinates();
+					swipeDownwardBy_Coordinates(ErrorMessage);
 					if (isElementDisplayed(targetElement)) {
 						break;
 					}
 				}
-			} catch (Exception e) {
-				System.out.println("Scroll to mobile element failed"+e.getMessage());
-			}
 		}
 	}
 
-	public static void scrollToElement_Upward(WebElement targetElement) {
+	public static void scrollToElement_Upward(WebElement targetElement, String ErrorMessage) throws IOException {
 		int start_x =631;
 		int start_Y =500;
 		int end_x =631;
 		int end_Y =1500;
 
-		if(AppiumDriverSetup.getDeviceName().equalsIgnoreCase("Cloud Device")){
+		if(ReadProperty.getPropertiesData("Platform_Execution").equalsIgnoreCase("Lambda_Cloud")){
 			try {
 				for (int i = 0; i < 10; i++) {
-					swipeAction(start_x, start_Y, end_x, end_Y);
+					scrollAction(start_x, start_Y, end_x, end_Y, ErrorMessage);
 					if (isElementDisplayed(targetElement)) {
 						break;
 					}
@@ -252,18 +239,23 @@ public class PerformActions extends AppiumDriverSetup
 		return elementEnabled;
 	}
 
-	public static void swipeDownwardBy_Coordinates(){
-		PointerInput  finger= new PointerInput(PointerInput.Kind.TOUCH, "finger");
-		Point start = new Point(631, 1500);
-		Point end = new Point (631, 500);
-		Sequence swipe = new Sequence(finger, 1);
-		swipe.addAction(finger.createPointerMove(Duration.ofMillis(500),
-				PointerInput.Origin.viewport(), start.getX(), start.getY()));
-		swipe.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
-		swipe.addAction(finger.createPointerMove(Duration.ofMillis(1000),
-				PointerInput.Origin.viewport(), end.getX(), end.getY()));
-		swipe.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
-		driver.perform(Arrays.asList(swipe));
+	public static void swipeDownwardBy_Coordinates(String Error_Message){
+		try{
+			PointerInput  finger= new PointerInput(PointerInput.Kind.TOUCH, "finger");
+			Point start = new Point(631, 1500);
+			Point end = new Point (631, 500);
+			Sequence swipe = new Sequence(finger, 1);
+			swipe.addAction(finger.createPointerMove(Duration.ofMillis(500),
+					PointerInput.Origin.viewport(), start.getX(), start.getY()));
+			swipe.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+			swipe.addAction(finger.createPointerMove(Duration.ofMillis(1000),
+					PointerInput.Origin.viewport(), end.getX(), end.getY()));
+			swipe.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+			driver.perform(Arrays.asList(swipe));
+		}catch (Exception e){
+			Assert.fail(Error_Message);
+		}
+
 	}
 	public static void swipeUpwardBy_Coordinates(){
 		PointerInput  finger= new PointerInput(PointerInput.Kind.TOUCH, "finger");

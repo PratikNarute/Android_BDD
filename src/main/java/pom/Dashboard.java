@@ -6,6 +6,9 @@ import org.openqa.selenium.support.PageFactory;
 import org.testng.Assert;
 import org.testng.asserts.SoftAssert;
 import utility.AppiumDriverSetup;
+
+import java.io.IOException;
+
 import static utility.PerformActions.click_action;
 import static utility.PerformActions.send_action;
 import static utility.PerformActions.isElementDisplayed;
@@ -34,20 +37,19 @@ public class Dashboard extends AppiumDriverSetup {
 
     Top_Up tp;
     public void validate_top_up_section_on_dashboard() throws InterruptedException {
-        Thread.sleep(5000);
+        Thread.sleep(10000);
         sa.assertTrue(isElementEnabled(topUpNow_button), "'Top Up now' button is not enabled to clickable: ");
         sa.assertTrue(isElementDisplayed(topUpSectionDashboard_box), "'Top up section box' is not displayed: ");
         sa.assertTrue(isElementEnabled(redeemNow_textButton), "'Redeemm now' text button is not enable to clickable: ");
-
         sa.assertAll();
 
     }
-    public void validate_shortcuts_section_on_dashboard() throws InterruptedException {
-        scrollToElement_Downward(shortcuts_callDataHistory_textButton);
+    public void validate_shortcuts_section_on_dashboard() throws InterruptedException, IOException {
+        scrollToElement_Downward(shortcuts_callDataHistory_textButton, "Scrolling failed to 'shortcuts_callDataHistory' button: ");
         sa.assertTrue(isElementEnabled(shortcuts_callDataHistory_textButton), "'Call and History' text button is not enable to clickable: ");
         sa.assertTrue(isElementEnabled(shortcuts_Statements_textButton), "'Statement' text button is not enable to clickable: ");
         sa.assertTrue(isElementEnabled(shortcuts_SavedCards_textButton), "'Saved Cards' text button is not enable to clickable: ");
-        scrollToElement_Upward(topUpNow_button);
+        scrollToElement_Upward(topUpNow_button, "Scrolling failed to 'Top Up Now' button: ");
 
         sa.assertAll();
     }

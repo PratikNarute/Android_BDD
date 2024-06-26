@@ -6,6 +6,8 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.testng.Assert;
 
+import java.io.IOException;
+
 import static stepDefination.BaseClass.*;
 
 public class StepDefination {
@@ -72,7 +74,7 @@ public class StepDefination {
     public void top_up_and_plan_should_be_added_successfuly() {
     }
     @Given("user should be login successfully {string}")
-    public void userShouldBeLoginSuccessfully(String country) throws InterruptedException {
+    public void userShouldBeLoginSuccessfully(String country) throws Exception {
         lg.validate_login_pages_with_valid_credentials(country);
 
     }
@@ -122,19 +124,18 @@ public class StepDefination {
     }
 
     @Then("shortcuts section related fields should be visible {string}")
-    public void shortcutsSectionRelatedFieldsShouldBeVisible(String country) throws InterruptedException {
+    public void shortcutsSectionRelatedFieldsShouldBeVisible(String country) throws InterruptedException, IOException {
         ds.validate_shortcuts_section_on_dashboard();
     }
     @When("enter valid Mobile No or Username")
     public void enter_valid_mobile_no_or_username() {
-
     }
     @When("enter valid OTP")
     public void enter_valid_otp() {
 
     }
     @Then("login should be successfully done with valid OTP {string}")
-    public void login_should_be_successfully_done_with_valid_otp(String country) throws InterruptedException {
+    public void login_should_be_successfully_done_with_valid_otp(String country) throws Exception {
         lg.validate_login_pages_with_valid_credentials(country);
     }
     @When("verify logout scenarios")
@@ -142,7 +143,7 @@ public class StepDefination {
 
     }
     @Then("logout should be done and navigate on login page {string}")
-    public void logout_should_be_done_and_navigate_on_login_page(String country) throws InterruptedException {
+    public void logout_should_be_done_and_navigate_on_login_page(String country) throws InterruptedException, IOException {
         lg.validate_logout_scenarios(country);
     }
 

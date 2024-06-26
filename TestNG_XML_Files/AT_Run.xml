@@ -1,0 +1,9 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+<suite name="Example Suite">
+    <test name="Example Test">
+        <classes>
+            <class name="testRunner.AT_Run"></class>
+            <class name="testRunner_Failed.AT_FailedRun"></class>
+        </classes>
+    </test>
+</suite>

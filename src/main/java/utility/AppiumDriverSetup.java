@@ -23,7 +23,6 @@ public class AppiumDriverSetup {
     private static AppiumDriverLocalService service;
     public static AndroidDriver driver;
     public static UiAutomator2Options options;
-    public static String platformExecution= "Lambda Cloud";
 
     public static void startAppiumServer() {
         try {
@@ -81,8 +80,9 @@ public class AppiumDriverSetup {
         }
     }
 
-    public static void lunchAndroidDriver(String appPackageName) throws MalformedURLException {
-        if(platformExecution.equalsIgnoreCase("Local")){
+    public static void lunchAndroidDriver(String appPackageName, String country) throws IOException {
+
+        if(ReadProperty.getPropertiesData("Platform_Execution").equalsIgnoreCase("Local")){
             // Set capabilities using UiAutomator2Options for local test execution
             options = new UiAutomator2Options();
             options.setDeviceName(getDeviceName());
@@ -99,28 +99,37 @@ public class AppiumDriverSetup {
             options.setAdbExecTimeout(Duration.ofSeconds(20));
             driver = new AndroidDriver(new URL("http://127.0.0.1:4723"),options);
         }
-        else{
+        else if (ReadProperty.getPropertiesData("Platform_Execution").equalsIgnoreCase("Lambda_Cloud")){
             // Set capabilities using UiAutomator2Options for lambda cloud test execution
             options = new UiAutomator2Options();
             options.setPlatformName("ANDROID");
             options.setDeviceName("Galaxy .*");
             options.setPlatformVersion("13");
-            options.setCapability("build", "LT-appium-java-cucumber");
+            options.setCapability("build", "App: "+appPackageName);
             options.setCapability("name", "Android Test");
             options.setCapability("isRealMobile", true);
-            options.setCapability("app", "lt://APP1016034991715000332382475");
+            options.setCapability("app", getAppID(country));
             options.setCapability("devicelog", true);
             options.setCapability("autoGrantPermissions", true);
             options.setCapability("network", false);
             options.setCapability("video", true);
             options.setCapability("visual", true);
 
-            String gridURL = "https://" + "krushna.jenaqualitrix" + ":" + "ZyDVxJ8RZPug8JkmTnWaMLcLf1LPTMxkWzwX6nIWWPbgfrQyjT" + "@" + "mobile-hub.lambdatest.com" + "/wd/hub";
+            String gridURL = "https://" + "pratik.narute" + ":" + "fOIiegGtqWxn5suxSquY8PaYEUYpnvbSb8ZX4agqNWng9TAkNu" + "@" + "mobile-hub.lambdatest.com" + "/wd/hub";
 //      String gridURL = "https://krushna.jenaqualitrix:ZyDVxJ8RZPug8JkmTnWaMLcLf1LPTMxkWzwX6nIWWPbgfrQyjT@mobile-hub.lambdatest.com/wd/hub";
 
             // Initialize the AndroidDriver
             driver = new AndroidDriver(new URL(gridURL), options);
         }
+    }
+    public static String getAppID(String country) throws IOException {
+        String APP_ID="";
+        if(country.equalsIgnoreCase("AT")){
+            APP_ID=ReadProperty.getPropertiesData("APP_ID_AT");
+        }else if(country.equalsIgnoreCase("UK")){
+            APP_ID= ReadProperty.getPropertiesData("APP_ID_UK");
+        }
+        return APP_ID;
     }
 
     public static String getDeviceName(){
@@ -315,5 +324,6 @@ public class AppiumDriverSetup {
         System.out.println("AppiumJSPath: " + actualJSPath);
         return actualJSPath;
     }
+
 
 }

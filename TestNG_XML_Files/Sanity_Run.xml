@@ -2,7 +2,8 @@
 <suite name="Example Suite">
     <test name="Example Test">
         <classes>
-            <class name="testRunner.Sanity_Run"/>
+            <class name="testRunner.Sanity_Run"></class>
+            <class name="testRunner_Failed.Sanity_FailedRun"></class>
         </classes>
     </test>
 </suite>
