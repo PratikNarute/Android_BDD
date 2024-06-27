@@ -3,7 +3,7 @@
     <test name="Example Test">
         <classes>
             <class name="testRunner.AT_Run"></class>
-            <class name="testRunner_Failed.AT_FailedRun"></class>
+            <class name="testRunner.Failed_Run"></class>
         </classes>
     </test>
 </suite>

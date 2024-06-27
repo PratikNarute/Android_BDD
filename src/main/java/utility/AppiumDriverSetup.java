@@ -31,7 +31,7 @@ public class AppiumDriverSetup {
             File nodeFile = null;
 
             String os = System.getProperty("os.name").toLowerCase();
-            System.out.println("OS: " + os);
+            System.out.println("Machine Execution OS: " + os);
             if (os.contains("mac")) {
                 nodeFile = new File(findNodePathInMac());
                 System.out.println("NodePath: " + findNodePathInMac());
@@ -64,6 +64,7 @@ public class AppiumDriverSetup {
 
             // Build and start the service
             service = AppiumDriverLocalService.buildService(builder);
+            System.out.println("====================================================================");
             service.start();
 
         } catch (Exception e) {
@@ -91,8 +92,6 @@ public class AppiumDriverSetup {
             uiAutomator2Options.setAppPackage(appPackageName);
             uiAutomator2Options.setAppActivity("com.lycamobile.MainActivity");
             uiAutomator2Options.setCapability("autoDismissAlerts", true);
-//		uiAutomator2Options.setNoReset(true);
-//		uiAutomator2Options.setFullReset(true);
             uiAutomator2Options.autoGrantPermissions();
             uiAutomator2Options.setUiautomator2ServerInstallTimeout(Duration.ofMillis(60000));
             uiAutomator2Options.setAndroidInstallTimeout(Duration.ofMillis(10000));
@@ -145,7 +144,7 @@ public class AppiumDriverSetup {
             xcuitestOptions.setCapability("build", "App: " + appPackageName);
             xcuitestOptions.setCapability("name", "IOS Test");
             xcuitestOptions.setCapability("isRealMobile", true);
-            xcuitestOptions.setCapability("app", "lt://APP10160352241719233528625235");
+            xcuitestOptions.setCapability("app", getAppID(country));
             xcuitestOptions.setCapability("devicelog", true);
             xcuitestOptions.setCapability("autoGrantPermissions", true);
             xcuitestOptions.setCapability("network", false);
@@ -164,14 +163,13 @@ public class AppiumDriverSetup {
 
     public static String getAppID(String country) throws IOException {
         String APP_ID = "";
-        if (country.equalsIgnoreCase("AT")) {
-            APP_ID = ReadProperty.getPropertiesData("APP_ID_AT");
-        } else if (country.equalsIgnoreCase("UK")) {
-            APP_ID = ReadProperty.getPropertiesData("APP_ID_UK");
+        if (ReadProperty.getPropertiesData("OS").contains("IOS")) {
+            APP_ID = ReadProperty.getPropertiesData("IOS_APP_ID_"+country);
+        } else  {
+            APP_ID = ReadProperty.getPropertiesData("Android_APP_ID_"+country);
         }
         return APP_ID;
     }
-
     public static String getDeviceName() {
         String deviceName = getConnectedDeviceUDIDUsing_adb();
         if (deviceName == null || deviceName.isEmpty()) {

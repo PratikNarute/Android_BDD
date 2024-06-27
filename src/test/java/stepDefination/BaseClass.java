@@ -30,6 +30,7 @@ import io.cucumber.java.*;
 import utility.ReadProperty;
 
 import static utility.AppiumDriverSetup.IOSdriver;
+import static utility.AppiumDriverSetup.getAppID;
 
 
 public class BaseClass {
@@ -54,17 +55,15 @@ public class BaseClass {
        String [] arrayContryName= scenario.getName().split("-");
        String countryName = arrayContryName[0];
        String appPackageName = getAppPackageName(countryName);
-        System.out.println("Start execution on platform: "+ ReadProperty.getPropertiesData("Platform_Execution"));
-        System.out.println("Start execution for App Package: "+appPackageName);
-        System.out.println("Start execution on OS: "+ReadProperty.getPropertiesData("OS"));
-
+        System.out.println("Platform Execution: "+ ReadProperty.getPropertiesData("Platform_Execution"));
+        System.out.println("Mobile Automation Name: "+ReadProperty.getPropertiesData("OS"));
+        System.out.println("App ID: "+getAppID(countryName));
         AppiumDriverSetup.startAppiumServer();
         System.out.println("Appium server started.................................................");
 
         if(ReadProperty.getPropertiesData("OS").contains("IOS")){
             AppiumDriverSetup.lunchIOSDriver(appPackageName, countryName);
             IOSdriver = AppiumDriverSetup.IOSdriver;
-            System.out.println(ReadProperty.getPropertiesData("OS")+": Driver lunched......................................");
 
             // Set name scenario name for lambda execution
             if(ReadProperty.getPropertiesData("Platform_Execution").equalsIgnoreCase("Lambda_Cloud")){
@@ -73,13 +72,13 @@ public class BaseClass {
         }else if(ReadProperty.getPropertiesData("OS").contains("Android")){
             AppiumDriverSetup.lunchAndroidDriver(appPackageName, countryName);
             androidDriver = AppiumDriverSetup.androidDriver;
-            System.out.println(ReadProperty.getPropertiesData("OS")+": Driver lunched......................................");
 
             // Set name scenario name for lambda execution
             if(ReadProperty.getPropertiesData("Platform_Execution").equalsIgnoreCase("Lambda_Cloud")){
                 androidDriver.executeScript("lambda-name=" + scenario.getName());
             }
         }
+        System.out.println(ReadProperty.getPropertiesData("OS")+": Driver lunched......................................");
 
         POM_Class_objects();
     }

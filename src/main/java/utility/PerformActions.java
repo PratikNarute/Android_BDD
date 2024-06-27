@@ -135,7 +135,7 @@ public class PerformActions extends AppiumDriverSetup
 	public static void  send_action(WebElement el, String data, String ErrorMessage) throws InterruptedException, IOException {
 		try {
 			putWebDriverWait(el, 5);
-			System.out.println(ErrorMessage+": Send action perform on: " + el.getText());
+			System.out.println("Send action perform on: " + el.getText());
 			el.sendKeys(data);
 			System.out.println("=====================================Done============================================");
 		} catch (TimeoutException e) {
