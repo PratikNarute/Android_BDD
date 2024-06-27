@@ -6,6 +6,7 @@ import org.openqa.selenium.support.PageFactory;
 import org.testng.Assert;
 import org.testng.asserts.SoftAssert;
 import utility.AppiumDriverSetup;
+import utility.ReadProperty;
 
 import java.io.IOException;
 
@@ -22,7 +23,7 @@ public class Login extends AppiumDriverSetup {
     WebElement skip_button;
     @FindBy(xpath = "//android.widget.Button[3]")
     WebElement continueToLogin_button;
-    @FindBy(xpath = "//android.widget.EditText[@content-desc=\"test:id/Login-text_field\"]")
+    @FindBy(xpath = "//android.widget.EditText[@content-desc=\"test:id/Login-text_field\"] | //XCUIElementTypeTextField[@name=\"test:id/Login-text_field\"]")
     WebElement mobileNO_inputTab;
     @FindBy(xpath = "//android.widget.EditText[@content-desc=\"test:id/otp-code-field\"]")
     WebElement OTP1_inputTab;
@@ -50,13 +51,17 @@ public class Login extends AppiumDriverSetup {
     private WebElement refresh_button;
     @FindBy(xpath = "//android.widget.Button[@resource-id=\"com.android.permissioncontroller:id/permission_allow_button\"]")
     private WebElement allow_button;
-    @FindBy(xpath = "//android.widget.TextView[@text=\"English\"]")
+    @FindBy(xpath = "//android.widget.TextView[@text=\"English\"] | //XCUIElementTypeOther[@name=\"English\"] | //XCUIElementTypeOther[@name=\"English\"]/following-sibling::XCUIElementTypeOther")
     WebElement english_button;
     @FindBy(xpath = "//android.widget.TextView[@content-desc=\"test:id/errorMessage-text\"]")WebElement invalidMobileNo_errorMessage;
 
 
-    public Login() {
-        PageFactory.initElements(driver, this);
+    public Login() throws IOException {
+        if(ReadProperty.getPropertiesData("OS").contains("IOS")){
+            PageFactory.initElements(IOSdriver,this);
+        }else{
+            PageFactory.initElements(androidDriver,this);
+        }
         sa = new SoftAssert();
     }
 
@@ -64,15 +69,13 @@ public class Login extends AppiumDriverSetup {
         Thread.sleep(6000);
         String mobileNO = readCountryDataFromExcel(country, "MOBILE_NO_1");
         String OTP = readCountryDataFromExcel(country, "OTP");
+
         validate_language_page(country);
         send_action(mobileNO_inputTab, mobileNO, "Mobile No input tab is not displayed: ");
         click_action(login_Button, "Login button is not enable to clickable: ");
         Assert.assertFalse(isElementDisplayed(invalidMobileNo_errorMessage), "Invalid Mobile Number for"+country+"-"+mobileNO);
         send_action(OTP1_inputTab, OTP, "'OTP' input tab is not displayed: ");
         click_action(confirmOTP_button, "'Confirm' button is not enable to clickable");
-//        if (isElementDisplayed(allow_button)) {
-//            click_action(allow_button);
-//        }
         click_action(letsHaveLook_arrowButton, "'Lets have look' page is not opened: ");
         click_action(termCondition_toggle, "'Term and Condition' toggle is not displayed: ");
         click_action(continue_button, "'Continue' button is missing");
@@ -88,9 +91,9 @@ public class Login extends AppiumDriverSetup {
         sa.assertAll();
     }
 
-    public void validate_language_page(String country) throws InterruptedException {
+    public void validate_language_page(String country) throws InterruptedException, IOException {
         if (!country.equalsIgnoreCase("UK")) {
-            assertTrue(isElementDisplayed(english_button), "App is not Lunched/Installed");
+            Assert.assertTrue(isElementDisplayed(english_button), "App is not Lunched/Installed");
             click_action(english_button, "'English' button is missing: ");
         }
     }

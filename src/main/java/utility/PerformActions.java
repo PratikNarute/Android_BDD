@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.Duration;
 
 
+import io.appium.java_client.ios.IOSDriver;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -24,12 +25,17 @@ import java.util.Arrays;
 import java.util.Collections;
 
 
-
 public class PerformActions extends AppiumDriverSetup
 {
-	public static void swipeAction(int startX, int startY, int endX, int endY)
-	{
-		    TouchAction touchAction = new TouchAction(driver);
+
+
+	public static void swipeAction(int startX, int startY, int endX, int endY) throws IOException {
+		TouchAction touchAction;
+		if(ReadProperty.getPropertiesData("OS").contains("IOS")){
+			touchAction = new TouchAction(IOSdriver);
+		}else{
+			touchAction = new TouchAction(androidDriver);
+		}
 		    PointOption pointStart = PointOption.point(startX, startY);
 		    PointOption pointEnd = PointOption.point(endX, endY);
 		    WaitOptions waitOption = WaitOptions.waitOptions(Duration.ofMillis(1000));
@@ -37,19 +43,27 @@ public class PerformActions extends AppiumDriverSetup
 		    touchAction.press(pointStart).waitAction(waitOption).moveTo(pointEnd).release().perform();
 
 	}
-	public static void longPress(int x, int y, AndroidDriver driver)
-	{
-		   TouchAction touchAction = new TouchAction(driver);
+	public static void longPress(int x, int y, AndroidDriver driver) throws IOException {
+		TouchAction touchAction;
+		if(ReadProperty.getPropertiesData("OS").contains("IOS")){
+			touchAction = new TouchAction(IOSdriver);
+		}else{
+			touchAction = new TouchAction(androidDriver);
+		}
 		   PointOption point = PointOption.point(x, y);
 		   WaitOptions waitOption = WaitOptions.waitOptions(Duration.ofMillis(15000));
 
 		   touchAction.longPress(point).waitAction(waitOption).release().perform();
 
 	}
-	public static void scrollAction(int startX, int startY, int endX, int endY, String ErroMessage) throws InterruptedException
-	{
+	public static void scrollAction(int startX, int startY, int endX, int endY, String ErroMessage) throws InterruptedException, IOException {
+		TouchAction touchAction;
+		if(ReadProperty.getPropertiesData("OS").contains("IOS")){
+			touchAction = new TouchAction(IOSdriver);
+		}else{
+			touchAction = new TouchAction(androidDriver);
+		}
 		try{
-			TouchAction touchAction = new TouchAction(driver);
 			touchAction.longPress(PointOption.point(startX, startY)).moveTo(PointOption.point(endX, endY)).release().perform();
 		}catch (Exception e){
 			Assert.fail(ErroMessage+" "+e.getMessage());
@@ -77,29 +91,32 @@ public class PerformActions extends AppiumDriverSetup
 	public static void longPressByElement(WebElement element, AndroidDriver driver)
 	{
 		//find location of the web element
-				Point location = element.getLocation();
+		Point location = element.getLocation();
 
-				PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+		PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
 
-				Sequence longpress = new Sequence(finger, 1);
-				longpress.addAction(finger.createPointerMove(Duration.ofMillis(0),PointerInput.Origin.viewport(), location.x, location.y));
-				longpress.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
-				longpress.addAction(finger.createPointerMove(Duration.ofMillis(1000),PointerInput.Origin.viewport(), location.x, location.y));
-				longpress.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+		Sequence longpress = new Sequence(finger, 1);
+		longpress.addAction(finger.createPointerMove(Duration.ofMillis(0),PointerInput.Origin.viewport(), location.x, location.y));
+		longpress.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+		longpress.addAction(finger.createPointerMove(Duration.ofMillis(1000),PointerInput.Origin.viewport(), location.x, location.y));
+		longpress.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
 
-				//perform the Sequence of action
-				driver.perform(Collections.singletonList(longpress));
+		//perform the Sequence of action
+		driver.perform(Collections.singletonList(longpress));
 	}
-	public static void click_action(WebElement el, String ErrorMessage) throws InterruptedException {
-		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+	public static void click_action(WebElement el, String ErrorMessage) throws InterruptedException, IOException {
 		try {
-			wait.until(ExpectedConditions.elementToBeClickable(el));
+			putWebDriverWait(el, 5);
 			System.out.println("Click on element: " + el.getText().replace("\n", "").trim());
 			el.click();
 			System.out.println("=====================================Done============================================");
 		} catch (StaleElementReferenceException e) {
 			System.out.println("Found StaleElementReferenceException: " + el);
-			driver.navigate().refresh(); Thread.sleep(4000);
+			if(System.getProperty("os.name").toLowerCase().contains("os")){
+				IOSdriver.navigate().refresh(); Thread.sleep(4000);
+			}else{
+				androidDriver.navigate().refresh(); Thread.sleep(4000);
+			}
 			System.out.println("Click on element: " + el.getText().replace("\n", "").trim());
 			el.click();
 			System.out.println("=====================================Done============================================");
@@ -113,28 +130,29 @@ public class PerformActions extends AppiumDriverSetup
 			el.click();
 			System.out.println("=====================================Done============================================");
 		}
-	}
+    }
 
-	public static void  send_action(WebElement el, String data, String ErrorMessage) throws InterruptedException {
-//        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+	public static void  send_action(WebElement el, String data, String ErrorMessage) throws InterruptedException, IOException {
 		try {
-			wait.until(ExpectedConditions.visibilityOf(el));
-//			System.out.println("Send action perform on: " + el.getAttribute("value"));
-			System.out.println(ErrorMessage+": Send action perform on: " + el.getAttribute("text"));
+			putWebDriverWait(el, 5);
+			System.out.println(ErrorMessage+": Send action perform on: " + el.getText());
 			el.sendKeys(data);
 			System.out.println("=====================================Done============================================");
 		} catch (TimeoutException e) {
 			System.out.println("==============================Fail===============================================");
 			Assert.fail(ErrorMessage+" Found NoSuchElementException: " + e.getMessage());
 		}catch (StaleElementReferenceException e){
-			driver.navigate().refresh();Thread.sleep(4000);
-			System.out.println("Send action perform on: " + el.getAttribute("text"));
+			if(System.getProperty("os.name").toLowerCase().contains("os")){
+				IOSdriver.navigate().refresh(); Thread.sleep(4000);
+			}else{
+				androidDriver.navigate().refresh(); Thread.sleep(4000);
+			}
+			System.out.println("Send action perform on: " + el.getText());
 			el.sendKeys(data);
 			System.out.println("=====================================Done============================================");
 		}catch (ElementNotInteractableException e){
 			Thread.sleep(2000);
-			System.out.println("Send action perform on: " + el.getAttribute("text"));
+			System.out.println("Send action perform on: " + el.getText());
 			el.sendKeys(data);
 			System.out.println("=====================================Done============================================");
 		}
@@ -195,14 +213,13 @@ public class PerformActions extends AppiumDriverSetup
 		}
 	}
 
-	public static boolean isElementDisplayed(WebElement element) throws InterruptedException {
+	public static boolean isElementDisplayed(WebElement element) throws InterruptedException, IOException {
 		boolean elementDisplayed = false;
 		try{
-			WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
-			wait.until(ExpectedConditions.visibilityOf(element));
+			putWebDriverWait(element, 5);
 			elementDisplayed = element.isDisplayed();
 			if (elementDisplayed){
-				System.out.println("Element is present on page: " + element.getAttribute("text"));
+				System.out.println("Element is present on page: " + element.getText());
 			}
 		}catch (TimeoutException e){
 			System.out.println("Element is not present on page: " + e.getMessage());
@@ -211,11 +228,10 @@ public class PerformActions extends AppiumDriverSetup
 		return elementDisplayed;
 	}
 
-	public static boolean isElementEnabled(WebElement element) throws InterruptedException {
+	public static boolean isElementEnabled(WebElement element) throws InterruptedException, IOException {
 		boolean elementEnabled = false;
 		try{
-			WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
-			wait.until(ExpectedConditions.visibilityOf(element));
+			putWebDriverWait(element, 5);
 			elementEnabled = element.isEnabled();
 			if (elementEnabled){
 				System.out.println("Element is enable to clickable: " + element.getText().replace("\n", "").trim());
@@ -226,7 +242,11 @@ public class PerformActions extends AppiumDriverSetup
 		}catch (TimeoutException e){
 			System.out.println("Element is not present on page: " + e.getMessage());
 		}catch (StaleElementReferenceException e){
-			driver.navigate().refresh();Thread.sleep(4000);
+			if(System.getProperty("os.name").toLowerCase().contains("os")){
+				IOSdriver.navigate().refresh(); Thread.sleep(4000);
+			}else{
+				androidDriver.navigate().refresh(); Thread.sleep(4000);
+			}
 			elementEnabled = element.isEnabled();
 			if (elementEnabled){
 				System.out.println("Element is enable to clickable: " + element.getText().replace("\n", "").trim());
@@ -251,7 +271,11 @@ public class PerformActions extends AppiumDriverSetup
 			swipe.addAction(finger.createPointerMove(Duration.ofMillis(1000),
 					PointerInput.Origin.viewport(), end.getX(), end.getY()));
 			swipe.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
-			driver.perform(Arrays.asList(swipe));
+			if(System.getProperty("os.name").toLowerCase().contains("os")){
+				IOSdriver.perform(Arrays.asList(swipe));
+			}else{
+				androidDriver.perform(Arrays.asList(swipe));
+			}
 		}catch (Exception e){
 			Assert.fail(Error_Message);
 		}
@@ -268,8 +292,32 @@ public class PerformActions extends AppiumDriverSetup
 		swipe.addAction(finger.createPointerMove(Duration.ofMillis(1000),
 				PointerInput.Origin.viewport(), end.getX(), end.getY()));
 		swipe.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
-		driver.perform(Arrays.asList(swipe));
+		if(System.getProperty("os.name").toLowerCase().contains("os")){
+			IOSdriver.perform(Arrays.asList(swipe));
+		}else{
+			androidDriver.perform(Arrays.asList(swipe));
+		}
 	}
+
+	public static void putWebDriverWait(WebElement el, int TimeInSecond) throws IOException {
+		WebDriverWait wait;
+		if(ReadProperty.getPropertiesData("OS").contains("IOS")){
+			wait = new WebDriverWait(IOSdriver, Duration.ofSeconds(TimeInSecond));
+		}else{
+			wait = new WebDriverWait(androidDriver, Duration.ofSeconds(TimeInSecond));
+		}
+		wait.until(ExpectedConditions.visibilityOf(el));
+
+	}
+	public static void navigateBack() throws IOException, InterruptedException {
+		if(ReadProperty.getPropertiesData("OS").contains("IOS")){
+			IOSdriver.navigate().back();
+		}else{
+			androidDriver.navigate().back();
+		}
+		Thread.sleep(3000);
+	}
+
 
 
 

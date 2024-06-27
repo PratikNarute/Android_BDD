@@ -2,18 +2,17 @@ package utility;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.options.UiAutomator2Options;
+import io.appium.java_client.ios.IOSDriver;
+import io.appium.java_client.ios.options.XCUITestOptions;
 import io.appium.java_client.service.local.AppiumDriverLocalService;
 import io.appium.java_client.service.local.AppiumServiceBuilder;
 import io.appium.java_client.service.local.flags.GeneralServerFlag;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.Assert;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
 
@@ -21,8 +20,10 @@ public class AppiumDriverSetup {
 
 
     private static AppiumDriverLocalService service;
-    public static AndroidDriver driver;
-    public static UiAutomator2Options options;
+    public static AndroidDriver androidDriver;
+    public static IOSDriver IOSdriver;
+    public static UiAutomator2Options uiAutomator2Options;
+    public static XCUITestOptions xcuitestOptions;
 
     public static void startAppiumServer() {
         try {
@@ -30,13 +31,13 @@ public class AppiumDriverSetup {
             File nodeFile = null;
 
             String os = System.getProperty("os.name").toLowerCase();
-            System.out.println("OS: "+os);
-            if(os.contains("mac")){
+            System.out.println("OS: " + os);
+            if (os.contains("mac")) {
                 nodeFile = new File(findNodePathInMac());
-                System.out.println("NodePath: "+findNodePathInMac());
-            }else if(os.contains("win")){
+                System.out.println("NodePath: " + findNodePathInMac());
+            } else if (os.contains("win")) {
                 nodeFile = new File(findNodePathInWindow());
-                System.out.println("NodePath: "+findNodePathInWindow());
+                System.out.println("NodePath: " + findNodePathInWindow());
             }
 
             if (!nodeFile.exists()) {
@@ -48,15 +49,14 @@ public class AppiumDriverSetup {
             // Set the path to the Appium main.js
 //            File appiumJSFile = new File("/usr/local/lib/node_modules/appium/build/lib/main.js");
             File appiumJSFile = new File(findAppiumPath());
-            System.out.println("AppiumJsPath: "+findAppiumPath());
+            System.out.println("AppiumJsPath: " + findAppiumPath());
             if (!appiumJSFile.exists()) {
                 Assert.fail("Appium main.js not found at: " + appiumJSFile.getPath());
             }
             builder.withAppiumJS(appiumJSFile);
 
 
-
-            // Specify other options
+            // Specify other uiAutomator2Options
             builder.withIPAddress("127.0.0.1");
             builder.usingPort(4723);
             builder.withArgument(GeneralServerFlag.SESSION_OVERRIDE);
@@ -67,77 +67,117 @@ public class AppiumDriverSetup {
             service.start();
 
         } catch (Exception e) {
-            System.out.println("Exception while starting Appium server: "+e.getMessage());
+            System.out.println("Exception while starting Appium server: " + e.getMessage());
         }
     }
 
     public static String stopAppiumLocalServer() {
         if (service != null && service.isRunning()) {
-             service.stop();
+            service.stop();
             return "Running Appium Local server stopped: ";
-        }else{
+        } else {
             return "Currently Appium Local server not running: ";
         }
     }
 
     public static void lunchAndroidDriver(String appPackageName, String country) throws IOException {
 
-        if(ReadProperty.getPropertiesData("Platform_Execution").equalsIgnoreCase("Local")){
-            // Set capabilities using UiAutomator2Options for local test execution
-            options = new UiAutomator2Options();
-            options.setDeviceName(getDeviceName());
-//    	options.setApp(appPath);
-            options.setAutomationName("UiAutomator2");
-            options.setAppPackage(appPackageName);
-            options.setAppActivity("com.lycamobile.MainActivity");
-            options.setCapability("autoDismissAlerts", true);
-//		options.setNoReset(true);
-//		options.setFullReset(true);
-            options.autoGrantPermissions();
-            options.setUiautomator2ServerInstallTimeout(Duration.ofMillis(60000));
-            options.setAndroidInstallTimeout(Duration.ofMillis(10000));
-            options.setAdbExecTimeout(Duration.ofSeconds(20));
-            driver = new AndroidDriver(new URL("http://127.0.0.1:4723"),options);
-        }
-        else if (ReadProperty.getPropertiesData("Platform_Execution").equalsIgnoreCase("Lambda_Cloud")){
-            // Set capabilities using UiAutomator2Options for lambda cloud test execution
-            options = new UiAutomator2Options();
-            options.setPlatformName("ANDROID");
-            options.setDeviceName("Galaxy .*");
-            options.setPlatformVersion("13");
-            options.setCapability("build", "App: "+appPackageName);
-            options.setCapability("name", "Android Test");
-            options.setCapability("isRealMobile", true);
-            options.setCapability("app", getAppID(country));
-            options.setCapability("devicelog", true);
-            options.setCapability("autoGrantPermissions", true);
-            options.setCapability("network", false);
-            options.setCapability("video", true);
-            options.setCapability("visual", true);
+        if (ReadProperty.getPropertiesData("Platform_Execution").equalsIgnoreCase("Local")) {
+            // Set capabilities using UiAutomator2uiAutomator2Options for local test execution
+            uiAutomator2Options = new UiAutomator2Options();
+            uiAutomator2Options.setDeviceName(getDeviceName());
+//    	uiAutomator2Options.setApp(appPath);
+            uiAutomator2Options.setAutomationName("UiAutomator2");
+            uiAutomator2Options.setAppPackage(appPackageName);
+            uiAutomator2Options.setAppActivity("com.lycamobile.MainActivity");
+            uiAutomator2Options.setCapability("autoDismissAlerts", true);
+//		uiAutomator2Options.setNoReset(true);
+//		uiAutomator2Options.setFullReset(true);
+            uiAutomator2Options.autoGrantPermissions();
+            uiAutomator2Options.setUiautomator2ServerInstallTimeout(Duration.ofMillis(60000));
+            uiAutomator2Options.setAndroidInstallTimeout(Duration.ofMillis(10000));
+            uiAutomator2Options.setAdbExecTimeout(Duration.ofSeconds(20));
+            androidDriver = new AndroidDriver(new URL("http://127.0.0.1:4723"), uiAutomator2Options);
+        } else if (ReadProperty.getPropertiesData("Platform_Execution").equalsIgnoreCase("Lambda_Cloud")) {
+            // Set capabilities using UiAutomator2uiAutomator2Options for lambda cloud test execution
+            uiAutomator2Options = new UiAutomator2Options();
+            uiAutomator2Options.setPlatformName("ANDROID");
+            uiAutomator2Options.setDeviceName("Galaxy .*");
+            uiAutomator2Options.setPlatformVersion("13");
+            uiAutomator2Options.setCapability("build", "App: " + appPackageName);
+            uiAutomator2Options.setCapability("name", "Android Test");
+            uiAutomator2Options.setCapability("isRealMobile", true);
+            uiAutomator2Options.setCapability("app", getAppID(country));
+            uiAutomator2Options.setCapability("devicelog", true);
+            uiAutomator2Options.setCapability("autoGrantPermissions", true);
+            uiAutomator2Options.setCapability("network", false);
+            uiAutomator2Options.setCapability("video", true);
+            uiAutomator2Options.setCapability("visual", true);
 
             String gridURL = "https://" + "pratik.narute" + ":" + "fOIiegGtqWxn5suxSquY8PaYEUYpnvbSb8ZX4agqNWng9TAkNu" + "@" + "mobile-hub.lambdatest.com" + "/wd/hub";
 //      String gridURL = "https://krushna.jenaqualitrix:ZyDVxJ8RZPug8JkmTnWaMLcLf1LPTMxkWzwX6nIWWPbgfrQyjT@mobile-hub.lambdatest.com/wd/hub";
 
             // Initialize the AndroidDriver
-            driver = new AndroidDriver(new URL(gridURL), options);
+            androidDriver = new AndroidDriver(new URL(gridURL), uiAutomator2Options);
         }
     }
+
+    public static void lunchIOSDriver(String appPackageName, String country) throws IOException {
+
+        if (ReadProperty.getPropertiesData("Platform_Execution").equalsIgnoreCase("Local")) {
+            xcuitestOptions = new XCUITestOptions();
+            xcuitestOptions.setPlatformName("iOS");
+            xcuitestOptions.setDeviceName("iPhone 14");
+            xcuitestOptions.setAutomationName("XCUITest");
+            xcuitestOptions.setBundleId("com.example.myapp");
+            xcuitestOptions.setUdid("your-device-udid");
+
+
+            // Initialize XCUITestDriver
+            IOSdriver = new IOSDriver(new URL("http://localhost:4723/wd/hub"), xcuitestOptions);
+
+        } else if (ReadProperty.getPropertiesData("Platform_Execution").equalsIgnoreCase("Lambda_Cloud")) {
+            xcuitestOptions = new XCUITestOptions();
+            xcuitestOptions.setPlatformName("ios");
+            xcuitestOptions.setDeviceName("iPhone.*");
+            xcuitestOptions.setPlatformVersion("16");
+            xcuitestOptions.setAutomationName("XCUITest");
+            xcuitestOptions.setCapability("build", "App: " + appPackageName);
+            xcuitestOptions.setCapability("name", "IOS Test");
+            xcuitestOptions.setCapability("isRealMobile", true);
+            xcuitestOptions.setCapability("app", "lt://APP10160352241719233528625235");
+            xcuitestOptions.setCapability("devicelog", true);
+            xcuitestOptions.setCapability("autoGrantPermissions", true);
+            xcuitestOptions.setCapability("network", false);
+            xcuitestOptions.setCapability("video", true);
+            xcuitestOptions.setCapability("visual", true);
+
+
+
+            String gridURL = "https://" + "pratik.narute" + ":" + "fOIiegGtqWxn5suxSquY8PaYEUYpnvbSb8ZX4agqNWng9TAkNu" + "@" + "mobile-hub.lambdatest.com" + "/wd/hub";
+//      String gridURL = "https://krushna.jenaqualitrix:ZyDVxJ8RZPug8JkmTnWaMLcLf1LPTMxkWzwX6nIWWPbgfrQyjT@mobile-hub.lambdatest.com/wd/hub";
+
+            // Initialize XCUITestDriver
+            IOSdriver = new IOSDriver(new URL(gridURL), xcuitestOptions);
+        }
+    }
+
     public static String getAppID(String country) throws IOException {
-        String APP_ID="";
-        if(country.equalsIgnoreCase("AT")){
-            APP_ID=ReadProperty.getPropertiesData("APP_ID_AT");
-        }else if(country.equalsIgnoreCase("UK")){
-            APP_ID= ReadProperty.getPropertiesData("APP_ID_UK");
+        String APP_ID = "";
+        if (country.equalsIgnoreCase("AT")) {
+            APP_ID = ReadProperty.getPropertiesData("APP_ID_AT");
+        } else if (country.equalsIgnoreCase("UK")) {
+            APP_ID = ReadProperty.getPropertiesData("APP_ID_UK");
         }
         return APP_ID;
     }
 
-    public static String getDeviceName(){
+    public static String getDeviceName() {
         String deviceName = getConnectedDeviceUDIDUsing_adb();
         if (deviceName == null || deviceName.isEmpty()) {
             deviceName = "Cloud Device"; // Fallback to a default name
         }
-        System.out.println("getDeviceName: "+deviceName);
+        System.out.println("getDeviceName: " + deviceName);
         return deviceName;
     }
 
@@ -205,6 +245,7 @@ public class AppiumDriverSetup {
         }
         return nodePath;
     }
+
     public static String findNodePathInWindow() {
         String nodePath = null;
         try {
@@ -234,6 +275,7 @@ public class AppiumDriverSetup {
         }
         return nodePath;
     }
+
     public static String findAppiumPath() {
         String appiumPath = null;
         String os = System.getProperty("os.name").toLowerCase();
@@ -242,7 +284,7 @@ public class AppiumDriverSetup {
 
         try {
 
-            if(os.contains("mac")){
+            if (os.contains("mac")) {
                 // Execute command to run 'npm root -g' to get global npm modules path
                 npmProcess = Runtime.getRuntime().exec("npm root -g");
                 // Read the npm root output
@@ -264,7 +306,7 @@ public class AppiumDriverSetup {
                 } else {
                     System.err.println("npm root -g command returned non-zero exit code: " + npmExitCode);
                 }
-            }else if(os.contains("win")){
+            } else if (os.contains("win")) {
                 String jsPaths = null;
                 if (os.contains("Win")) {
                     String whereAppium = "where" + " " + "appium";
@@ -290,12 +332,12 @@ public class AppiumDriverSetup {
             }
 
 
-
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
         return appiumPath;
     }
+
     public static String getAppiumJSPath() throws IOException, Exception {
 
         String jsPaths = null;
@@ -324,6 +366,4 @@ public class AppiumDriverSetup {
         System.out.println("AppiumJSPath: " + actualJSPath);
         return actualJSPath;
     }
-
-
 }

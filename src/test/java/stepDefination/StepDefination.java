@@ -58,7 +58,7 @@ public class StepDefination {
     public void navigate_on_3d_page() {
     }
     @And("only Top Up should be added successfuly {string}")
-    public void onlyTopUpShouldBeAddedSuccessfuly(String country) throws InterruptedException {
+    public void onlyTopUpShouldBeAddedSuccessfuly(String country) throws InterruptedException, IOException {
         tp.validate_top_up_flow_with_adding_only_top_up(country);
     }
     @When("navigate on the dashboard of my account page")
@@ -95,7 +95,7 @@ public class StepDefination {
     public void verify_top_up_section() {
     }
     @Then("top up balance and top up button should be visible")
-    public void top_up_balance_and_top_up_button_should_be_visible() throws InterruptedException {
+    public void top_up_balance_and_top_up_button_should_be_visible() throws InterruptedException, IOException {
        ds.validate_top_up_section_on_dashboard();
     }
     @Then("redeem now functionality should be visible")
@@ -136,7 +136,6 @@ public class StepDefination {
     }
     @Then("login should be successfully done with valid OTP {string}")
     public void login_should_be_successfully_done_with_valid_otp(String country) throws Exception {
-        Assert.fail();
         lg.validate_login_pages_with_valid_credentials(country);
 
     }

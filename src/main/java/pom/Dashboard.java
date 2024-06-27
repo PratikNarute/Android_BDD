@@ -6,8 +6,10 @@ import org.openqa.selenium.support.PageFactory;
 import org.testng.Assert;
 import org.testng.asserts.SoftAssert;
 import utility.AppiumDriverSetup;
+import utility.ReadProperty;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import static utility.PerformActions.click_action;
 import static utility.PerformActions.send_action;
@@ -20,8 +22,12 @@ import static utility.PerformActions.scrollToElement_Upward;
 public class Dashboard extends AppiumDriverSetup {
 
     SoftAssert sa;
-    public Dashboard(){
-        PageFactory.initElements(driver,this);
+    public Dashboard() throws IOException {
+        if(ReadProperty.getPropertiesData("OS").contains("IOS")){
+            PageFactory.initElements(IOSdriver,this);
+        }else{
+            PageFactory.initElements(androidDriver,this);
+        }
         sa = new SoftAssert();
 
     }
@@ -36,7 +42,7 @@ public class Dashboard extends AppiumDriverSetup {
 
 
     Top_Up tp;
-    public void validate_top_up_section_on_dashboard() throws InterruptedException {
+    public void validate_top_up_section_on_dashboard() throws InterruptedException, IOException {
         Thread.sleep(10000);
         sa.assertTrue(isElementEnabled(topUpNow_button), "'Top Up now' button is not enabled to clickable: ");
         sa.assertTrue(isElementDisplayed(topUpSectionDashboard_box), "'Top up section box' is not displayed: ");
