@@ -9,6 +9,7 @@ import utility.AppiumDriverSetup;
 
 import java.io.IOException;
 
+import static org.testng.Assert.assertTrue;
 import static utility.PerformActions.*;
 import static utility.ReadProperty.readCountryDataFromExcel;
 
@@ -66,7 +67,7 @@ public class Login extends AppiumDriverSetup {
         validate_language_page(country);
         send_action(mobileNO_inputTab, mobileNO, "Mobile No input tab is not displayed: ");
         click_action(login_Button, "Login button is not enable to clickable: ");
-        Assert.assertFalse(isElementDisplayed(invalidMobileNo_errorMessage), "Invalid Mobile Number for "+country+"-"+mobileNO);
+        Assert.assertFalse(isElementDisplayed(invalidMobileNo_errorMessage), "Invalid Mobile Number for"+country+"-"+mobileNO);
         send_action(OTP1_inputTab, OTP, "'OTP' input tab is not displayed: ");
         click_action(confirmOTP_button, "'Confirm' button is not enable to clickable");
 //        if (isElementDisplayed(allow_button)) {
@@ -82,15 +83,14 @@ public class Login extends AppiumDriverSetup {
         click_action(menuListFooter_iconButton, "'Menu List Footer' button is missing: ");
         scrollToElement_Downward(menuList_logout_button, "Does not scroll to 'Menu List-Logout' button: ");
         click_action(menuList_logout_button, "'MenuList_Logout' button is missing: ");
-        isElementEnabled(popUp_yesLogout_button);
-        isElementEnabled(popUp_noLogout_button);
+        sa.assertTrue(isElementEnabled(popUp_noLogout_button), "'popUp_noLogout_button' is not enable to clickable: ");
         click_action(popUp_yesLogout_button, "'popUp_yesLogout_button' is missing: ");
-
+        sa.assertAll();
     }
 
     public void validate_language_page(String country) throws InterruptedException {
         if (!country.equalsIgnoreCase("UK")) {
-            Assert.assertTrue(isElementDisplayed(english_button), "App is not Lunched/Installed");
+            assertTrue(isElementDisplayed(english_button), "App is not Lunched/Installed");
             click_action(english_button, "'English' button is missing: ");
         }
     }

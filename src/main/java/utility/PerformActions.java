@@ -126,7 +126,7 @@ public class PerformActions extends AppiumDriverSetup
 			System.out.println("=====================================Done============================================");
 		} catch (TimeoutException e) {
 			System.out.println("==============================Fail===============================================");
-			Assert.fail("Found NoSuchElementException: " + e.getMessage());
+			Assert.fail(ErrorMessage+" Found NoSuchElementException: " + e.getMessage());
 		}catch (StaleElementReferenceException e){
 			driver.navigate().refresh();Thread.sleep(4000);
 			System.out.println("Send action perform on: " + el.getAttribute("text"));

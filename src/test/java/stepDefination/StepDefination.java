@@ -136,7 +136,9 @@ public class StepDefination {
     }
     @Then("login should be successfully done with valid OTP {string}")
     public void login_should_be_successfully_done_with_valid_otp(String country) throws Exception {
+        Assert.fail();
         lg.validate_login_pages_with_valid_credentials(country);
+
     }
     @When("verify logout scenarios")
     public void verify_logout_scenarios() {
